@@ -1,8 +1,8 @@
 const itemList = document.querySelector('#item-list')
 
-const items = itemList.children;
-
 const clearAll = document.querySelector('#clear')
+
+const filter = document.querySelector('#filter')
 
 
 
@@ -76,6 +76,7 @@ ADD ITEMS TO THE LIST BY CLICKING 'ADD ITEMS'
 //this is a search field
 const addItem = document.querySelector('#item-input')
 
+
 // this is an add item button
 const addItemBtn = document.querySelector('.btn')
 
@@ -88,7 +89,10 @@ addItemBtn.addEventListener('click', (e)=>{
     } else {
         alert('Please fill in the form')
     }
+
+    addItemToStorage(addItem.value)
     addItem.value = ''
+    checkUI()
 })
 
 function newItem(item) {
@@ -103,10 +107,6 @@ function newItem(item) {
 
     itemList.appendChild(li)
 
-    btn.addEventListener('click', () => {
-        li.outerHTML = '';
-      });
-    
 }
 
 function createBtn(classes){
@@ -122,37 +122,80 @@ function createIcon(classes){
     return icon
 }
 
+/*====================
+    LOCAL STORAGE
+======================*/
+function addItemToStorage(item){
+    let itemsFromStorage;
+
+    if(localStorage.getItem('items') === null){
+        itemsFromStorage = []
+    } else{
+        itemsFromStorage = JSON.parse(localStorage.getItem('items'))
+    }
+
+    // add new item to array
+    itemsFromStorage.push(item);
+
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage))
+}
 
 /*====================
  CLICK ON CROSS TO REMOVE ITEM
 ======================*/
+function removeItem(e){
+    if (e.target.parentElement.classList.contains('remove-item')){
+        if (confirm('Are you sure you want to delete the item ? Press "OK" for Yes')) {
 
-//   const crossBtn = document.getElementsByClassName('remove-item')
-
-// console.log(crossBtn)
-
-// for (const item of crossBtn) {
-//     item.addEventListener('click', () => {
-//       item.parentElement.outerHTML = '';
-//     });
-//   }
-
-itemList.addEventListener('click', (e) => {
-    if(e.target.tagName === 'I'){
-        e.target.parentElement.parentElement.remove()
-    } else if (e.target.tagName === 'BUTTON'){
-        e.target.parentElement.remove()
+            e.target.parentElement.parentElement.remove();
+            checkUI()
+        }
     }
-})
+}
+
+itemList.addEventListener('click', removeItem)
+
+// itemList.addEventListener('click', (e) => {
+//     if(e.target.tagName === 'I'){
+//         e.target.parentElement.parentElement.remove()
+//     } else if (e.target.tagName === 'BUTTON'){
+//         e.target.parentElement.remove()
+//     }
+// })
 
 
   /*====================
  CLEAR ALL BUTTON
 ======================*/
 
-clearAll.addEventListener('click', ()=>{
-    itemList.innerHTML = ''
-})
+function clear(){
+    while(itemList.firstChild){
+        itemList.removeChild(itemList.firstChild)
+    }
+    checkUI()
+}
+
+// clearAll.addEventListener('click', ()=>{
+//     itemList.innerHTML = ''
+// })
+
+clearAll.addEventListener('click', clear)
+
+function checkUI(){
+    const items = itemList.querySelectorAll('li');
+    console.log(items)
+    if (items.length === 0){
+        filter.style.display = 'none'
+        clearAll.style.display = 'none'
+    } else {
+        filter.style.display = 'block'
+        clearAll.style.display = 'block'
+    }
+}
+
+// clearAll.addEventListener('click', checkUI)
+// addItemBtn.addEventListener('click', checkUI)
+checkUI()
 
 
 function onSubmit(e){
@@ -172,5 +215,29 @@ form.addEventListener('submit', onSubmit)
 //     alert('event bubbling')
 // })
 
+  /*====================
+    FILTER ITEMS
+======================*/
+
+function filterItems(e){
+    const items = itemList.querySelectorAll('li');
+    const text = e.target.value.toLowerCase();
+
+    items.forEach((item) =>{
+        const itemName = item.innerText.toLowerCase()
+        if(itemName.indexOf(text) != -1){
+            item.style.display = 'flex'
+            console.log(itemName)
+        } else{
+            item.style.display = 'none'
+            // console.log(itemName)
+
+        }
+            // console.log(itemName)
+        
+    })
+}
+
+filter.addEventListener('input', filterItems)
 
 
