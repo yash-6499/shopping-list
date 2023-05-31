@@ -6,11 +6,12 @@ const filter = document.querySelector('#filter')
 
 const form = document.querySelector('#item-form')
 
-const formBtn = form.querySelector('button')
-
 let isEditMode = false
 
 
+/*====================
+LETS YOU ADD ITEMS IN A CUSTOMIZABLE WAY
+======================*/
 
 function insertAfter(newEl, existingEl){
     const ul = document.querySelector('ul');
@@ -38,16 +39,36 @@ const addItemBtn = document.querySelector('.btn')
 
 // this adds the input to my list
 addItemBtn.addEventListener('click', (e)=>{
-    // e.preventDefault()
+    e.preventDefault()
+
+    if (isEditMode) {
+        const itemToEdit = itemList.querySelector('.edit-mode');
+
+        removeItemFromStorage(itemToEdit.textContent)
+        itemToEdit.classList.remove('edit-mode');
+        itemToEdit.remove()
+        isEditMode = false
+    } else {
+        if (checkIfItemExists(addItem.value)){
+            alert('That item already exists!')
+            return;
+        }
+    }
+    
     if (addItem.value !== ''){
-        // this newItem function is defined above
+        // this newItem function is defined below
         newItem(addItem.value)
+        addItemToStorage(addItem.value)
     } else {
         alert('Please fill in the form')
     }
 
-    addItemToStorage(addItem.value)
+    
+    
+
+    // It empties the search field after you press add item button
     addItem.value = ''
+
     checkUI()
 })
 
@@ -86,7 +107,7 @@ function addItemToStorage(item){
 
     // add new item to array
     itemsFromStorage.push(item);
-
+    
     localStorage.setItem('items', JSON.stringify(itemsFromStorage))
 }
 
@@ -123,14 +144,22 @@ function onClickItem(e){
     }
 }
 
+function checkIfItemExists(item){
+    const itemsFromStorage = getItemsFromStorage();
+
+    return itemsFromStorage.includes(item)
+}
+
 function setItemToEdit(item){
     isEditMode = true
-
-    itemList.querySelectorAll('li').forEach((i)=> i.classList.remove('edit-mode'))
-
-    item.style.color = '#ccc'
-    formBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item'
-    formBtn.style.backgroundColor = '#228b22'
+    console.log('yoyo')
+    itemList
+    .querySelectorAll('li')
+    .forEach((i)=> i.classList.remove('edit-mode'))
+    
+    item.classList.add('edit-mode');
+    addItemBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item'
+    addItemBtn.style.backgroundColor = '#228b22'
     addItem.value = item.textContent
 }
 
@@ -162,9 +191,11 @@ itemList.addEventListener('click', onClickItem)
 ======================*/
 
 function clear(){
-    while(itemList.firstChild){
-        itemList.removeChild(itemList.firstChild)
-        localStorage.clear()
+    if (confirm("Are you sure?")) {
+        while(itemList.firstChild){
+            itemList.removeChild(itemList.firstChild)
+            localStorage.clear()
+        }
     }
     // localStorage.removeItem('items')
     checkUI()
@@ -175,8 +206,8 @@ function clear(){
 clearAll.addEventListener('click', clear)
 
 function checkUI(){
+    addItem.value = ''
     const items = itemList.querySelectorAll('li');
-    console.log(items)
     if (items.length === 0){
         filter.style.display = 'none'
         clearAll.style.display = 'none'
@@ -184,22 +215,14 @@ function checkUI(){
         filter.style.display = 'block'
         clearAll.style.display = 'block'
     }
+
+    addItemBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add item'
+    addItemBtn.style.backgroundColor = '#333'
+
+    isEditMode = false
 }
 
 checkUI()
-
-
-function onSubmit(e){
-    e.preventDefault()
-    
-    console.log('form submitted')
-}
-
-
-
-console.log(form)
-
-form.addEventListener('submit', onSubmit)
 
 
   /*====================
