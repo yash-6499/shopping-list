@@ -4,40 +4,13 @@ const clearAll = document.querySelector('#clear')
 
 const filter = document.querySelector('#filter')
 
+const form = document.querySelector('#item-form')
+
+const formBtn = form.querySelector('button')
+
+let isEditMode = false
 
 
-// newItem("watermelon")
-// newItem("keri ka pani")
-// newItem("Aamrass")
-// newItem('randiiiiiiiii')
-
-/* 
-
-<li>
-    Apples
-    <button class="remove-item btn-link text-red">
-    <i class="fa-solid fa-xmark"></i>
-    </button>
-</li>
-
-*/
-
-
-// const filter = document.querySelector('.filter')
-
-// const h2 = document.createElement('h2')
-// h2.textContent = "hellooo"
-
-// filter.insertAdjacentElement('afterend', h2)
-
-// const ul = document.querySelector('ul')
-
-// const li = document.createElement('li')
-// li.textContent = 'lauda lele mera'
-
-// const elem = document.querySelector(`li:nth-child(${1 + 1})`)
-
-// ul.insertBefore(li, elem)
 
 function insertAfter(newEl, existingEl){
     const ul = document.querySelector('ul');
@@ -50,23 +23,6 @@ function insertAfter(newEl, existingEl){
     ul.insertBefore(li, elem)
 }
 
-// insertAfter('bullet bike', 2)
-
-// insertAfter('insertAfter', 1)
-// insertAfter('chal laudee', 2)
-// insertAfter('kya vishay broo', 4)
-
-// function insertAfter(newEl, existingEl) {
-//     existingEl.parentElement.insertBefore(newEl, existingEl.nextSibling);
-//   }
-
-// const li = document.createElement('li')
-// li.textContent = `hthhh`
-
-// const elem = document.querySelector(`li:nth-child(7)`)
-
-// insertAfter(li, elem)
-// insertAfter(li, elem)
 
 
 /*====================
@@ -126,6 +82,16 @@ function createIcon(classes){
     LOCAL STORAGE
 ======================*/
 function addItemToStorage(item){
+    const itemsFromStorage = getItemsFromStorage();
+
+    // add new item to array
+    itemsFromStorage.push(item);
+
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage))
+}
+
+
+function getItemsFromStorage(){
     let itemsFromStorage;
 
     if(localStorage.getItem('items') === null){
@@ -134,34 +100,61 @@ function addItemToStorage(item){
         itemsFromStorage = JSON.parse(localStorage.getItem('items'))
     }
 
-    // add new item to array
-    itemsFromStorage.push(item);
-
-    localStorage.setItem('items', JSON.stringify(itemsFromStorage))
+    return itemsFromStorage
 }
+
+function displayItems(){
+    const itemsFromStorage = getItemsFromStorage();
+    itemsFromStorage.forEach(item => newItem(item))
+    checkUI()
+}
+
+document.addEventListener('DOMContentLoaded', displayItems)
 
 /*====================
  CLICK ON CROSS TO REMOVE ITEM
 ======================*/
-function removeItem(e){
-    if (e.target.parentElement.classList.contains('remove-item')){
-        if (confirm('Are you sure you want to delete the item ? Press "OK" for Yes')) {
 
-            e.target.parentElement.parentElement.remove();
-            checkUI()
-        }
+function onClickItem(e){
+    if (e.target.parentElement.classList.contains('remove-item')){
+        removeItem(e.target.parentElement.parentElement)
+    } else{
+        setItemToEdit(e.target)
     }
 }
 
-itemList.addEventListener('click', removeItem)
+function setItemToEdit(item){
+    isEditMode = true
 
-// itemList.addEventListener('click', (e) => {
-//     if(e.target.tagName === 'I'){
-//         e.target.parentElement.parentElement.remove()
-//     } else if (e.target.tagName === 'BUTTON'){
-//         e.target.parentElement.remove()
-//     }
-// })
+    itemList.querySelectorAll('li').forEach((i)=> i.classList.remove('edit-mode'))
+
+    item.style.color = '#ccc'
+    formBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item'
+    formBtn.style.backgroundColor = '#228b22'
+    addItem.value = item.textContent
+}
+
+function removeItem(e){
+    
+        if (confirm('Are you sure you want to delete the item ? Press "OK" for Yes')) {
+            e.remove();
+            //remove item from storage
+            removeItemFromStorage(e.textContent)
+            checkUI()
+        }
+}
+
+function removeItemFromStorage(item){
+    let itemsFromStorage = getItemsFromStorage();
+
+    // filter out item to be removed
+    itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+    // re-set to localstorage
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage))
+}
+
+itemList.addEventListener('click', onClickItem)
 
 
   /*====================
@@ -171,13 +164,13 @@ itemList.addEventListener('click', removeItem)
 function clear(){
     while(itemList.firstChild){
         itemList.removeChild(itemList.firstChild)
+        localStorage.clear()
     }
+    // localStorage.removeItem('items')
     checkUI()
 }
 
-// clearAll.addEventListener('click', ()=>{
-//     itemList.innerHTML = ''
-// })
+
 
 clearAll.addEventListener('click', clear)
 
@@ -193,8 +186,6 @@ function checkUI(){
     }
 }
 
-// clearAll.addEventListener('click', checkUI)
-// addItemBtn.addEventListener('click', checkUI)
 checkUI()
 
 
@@ -205,15 +196,11 @@ function onSubmit(e){
 }
 
 
-const form = document.querySelector('#item-form')
+
 console.log(form)
 
 form.addEventListener('submit', onSubmit)
 
-
-// window.addEventListener('click', ()=>{
-//     alert('event bubbling')
-// })
 
   /*====================
     FILTER ITEMS
@@ -230,10 +217,10 @@ function filterItems(e){
             console.log(itemName)
         } else{
             item.style.display = 'none'
-            // console.log(itemName)
+
 
         }
-            // console.log(itemName)
+
         
     })
 }
