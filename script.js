@@ -78,8 +78,10 @@ function newItem(item) {
     const text = document.createTextNode(`${item}`)
     
     const btn = createBtn('remove-item btn-link text-red')
+    const EditBtn = createBtnforEdit('click-to-edit btn-link text-red')
 
     li.appendChild(text)
+    li.appendChild(EditBtn)
     li.appendChild(btn)
 
     itemList.appendChild(li)
@@ -92,11 +94,22 @@ function createBtn(classes){
     btn.appendChild(createIcon('fa-solid fa-xmark'))
     return btn
 }
+function createBtnforEdit(classes){
+    const EditBtn = document.createElement('button')
+    EditBtn.classList = classes;
+    EditBtn.appendChild(createIcon2('fa-solid fa-pen-to-square fa-2xs'))
+    return EditBtn
+}
 
 function createIcon(classes){
     const icon = document.createElement('i')
     icon.classList = classes;
     return icon
+}
+function createIcon2(classes){
+    const icon2 = document.createElement('i')
+    icon2.classList = classes;
+    return icon2
 }
 
 /*====================
@@ -139,38 +152,18 @@ document.addEventListener('DOMContentLoaded', displayItems)
 function onClickItem(e){
     if (e.target.parentElement.classList.contains('remove-item')){
         removeItem(e.target.parentElement.parentElement)
-    } else{
-        setItemToEdit(e.target)
     }
-}
 
-function checkIfItemExists(item){
-    const itemsFromStorage = getItemsFromStorage();
-
-    return itemsFromStorage.includes(item)
-}
-
-function setItemToEdit(item){
-    isEditMode = true
-    console.log('yoyo')
-    itemList
-    .querySelectorAll('li')
-    .forEach((i)=> i.classList.remove('edit-mode'))
-    
-    item.classList.add('edit-mode');
-    addItemBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item'
-    addItemBtn.style.backgroundColor = '#228b22'
-    addItem.value = item.textContent
 }
 
 function removeItem(e){
     
-        if (confirm('Are you sure you want to delete the item ? Press "OK" for Yes')) {
-            e.remove();
-            //remove item from storage
-            removeItemFromStorage(e.textContent)
-            checkUI()
-        }
+    if (confirm('Are you sure you want to delete the item ? Press "OK" for Yes')) {
+        e.remove();
+        //remove item from storage
+        removeItemFromStorage(e.textContent)
+        checkUI()
+    }
 }
 
 function removeItemFromStorage(item){
@@ -183,7 +176,42 @@ function removeItemFromStorage(item){
     localStorage.setItem('items', JSON.stringify(itemsFromStorage))
 }
 
-itemList.addEventListener('click', onClickItem)
+
+/*====================
+ CLICK ON PENCIL ICON TO EDIT ITEM
+======================*/
+
+function editItem(e){
+    if(e.target.parentElement.classList.contains('click-to-edit')){
+        setItemToEdit(e.target.parentElement.parentElement)
+    }
+}
+
+function setItemToEdit(item){
+    isEditMode = true
+    itemList
+    .querySelectorAll('li')
+    .forEach((i)=> i.classList.remove('edit-mode'))
+    
+    item.classList.add('edit-mode');
+    addItemBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item'
+    addItemBtn.style.backgroundColor = '#228b22'
+    addItem.value = item.textContent
+}
+
+
+function checkIfItemExists(item){
+    const itemsFromStorage = getItemsFromStorage();
+
+    return itemsFromStorage.includes(item)
+}
+
+
+
+
+
+
+
 
 
   /*====================
@@ -249,5 +277,9 @@ function filterItems(e){
 }
 
 filter.addEventListener('input', filterItems)
+
+
+itemList.addEventListener('click', onClickItem)
+itemList.addEventListener('click', editItem)
 
 
