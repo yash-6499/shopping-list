@@ -14,6 +14,8 @@ body {
   line-height: 1.5;
   color: #333;
   background-color: #f5f5f5;
+
+  position: relative;
 }
 
 header {
@@ -127,10 +129,17 @@ header h1 {
   .items li {
     width: 100%;
   }
+
+  .click-to-edit{
+    margin-right: -250px;
+  }
+
+  
 }
 
 .author{
-  bottom: 20px;
+  top: 550px;
+  /* bottom: 100px; */
   right: 100px;
   left: 100px;
   position: absolute;
