@@ -128,3 +128,11 @@ header h1 {
     width: 100%;
   }
 }
+
+.author{
+  bottom: 20px;
+  right: 100px;
+  left: 100px;
+  position: absolute;
+  text-align: center;
+}
