@@ -115,7 +115,7 @@ header h1 {
 .items li {
   display: flex;
   justify-content: space-between;
-  width: 45%;
+  /* width: 45%; */
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px 15px;
@@ -135,4 +135,11 @@ header h1 {
   left: 100px;
   position: absolute;
   text-align: center;
+}
+
+.fa-pen-to-square{
+  font-size: 12px;
+  padding-right: 5px;
+  padding-top: 7px;
+  margin-left: 27px;
 }
