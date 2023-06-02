@@ -283,3 +283,26 @@ itemList.addEventListener('click', onClickItem)
 itemList.addEventListener('click', editItem)
 
 
+  /*====================
+    NIGHT MODE BUTTON
+======================*/
+
+const modeBtn = document.querySelector('.mode-btn')
+
+function switchMode(){
+    document.body.classList.toggle('dark-mode')
+    
+
+    if (document.body.classList.contains('dark-mode')) {
+        modeBtn.innerHTML = '<div class="sun"></div>'; // Night mode HTML
+
+        clearAll.style.color = '#fff'
+        filter.style.color = '#fff'
+      } else {
+        modeBtn.innerHTML = '<i class="fa-solid fa-moon fa-2xl"></i>'; // Light mode HTML
+        clearAll.style.color = '#000'
+        filter.style.color = '#000'
+      }
+}
+
+modeBtn.addEventListener('click', switchMode)
